@@ -16,14 +16,13 @@ class TextNode():
         self.url = url
 
     def __eq__(self, other_node):
-        text_equals = self.text == other_node.text
-        text_type_equals = self.text_type == other_node.text_type
-        url_equals = self.url == other_node.url
-
-        if text_equals and text_type_equals and url_equals:
-            return True
-        else:
+        if not isinstance(other_node, TextNode):
             return False
+        return (
+            self.text == other_node.text and
+            self.text_type == other_node.text_type and
+            self.url == other_node.url
+        )
 
     def __repr__(self):
         print(f"TextNode({self.text}, {self.text_type.value}, {self.url})")
