@@ -11,4 +11,8 @@ def main():
     html_node_one = HTMLNode("a", None, None, {"href": "https://www.google.com","target": "_blank",})
     html_node_one.props_to_html()
 
+    node = TextNode("This is text with a `code block` word", TextType.TEXT)
+    left = node.text.split("`")
+    print(left)
+
 main()

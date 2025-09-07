@@ -6,7 +6,7 @@ class TextType(Enum):
     ITALIC_TEXT = "_Italic Text_"
     CODE_TEXT = "`Code Text`"
     LINK = "[anchor text](url)"
-    IMAGE = "![alt text](url)"
+    IMAGE = "![alt text](url)" 
 
 
 class TextNode():
@@ -27,6 +27,4 @@ class TextNode():
     def __repr__(self):
         print(f"TextNode({self.text}, {self.text_type.value}, {self.url})")
         return f"TextNode({self.text}, {self.text_type.value}, {self.url})"
-    
-    def text_node_to_html_node(text_node):
-        pass 
+        
