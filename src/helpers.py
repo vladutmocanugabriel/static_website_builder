@@ -1,4 +1,5 @@
-from src.htmlnode import HTMLNode, LeafNode, ParentNode
+import re
+from src.htmlnode import *
 from src.textnode import *
 
 def text_node_to_html_node(text_node):
@@ -38,6 +39,36 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             else:
                 new_nodes.append(TextNode(part, text_type))
     
+    return new_nodes
+
+def extract_markdown_images(text):
+    return re.findall(r"!\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+
+def extract_markdown_links(text):
+    return re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
+
+def split_nodes_image(old_nodes):
+    new_nodes = []
+    for node in old_nodes:
+        if node.text_type == TextType.TEXT:
+            if len(extract_markdown_images(node.text)) == 0:
+                new_nodes.append(node)
+            else:
+                parts = extract_markdown_images(node.text)
+                remaining = node.text
+                for part in parts:
+                    sections =remaining.split(f"![{part[0]}]({part[1]})", 1)
+                    if len(sections[0]) != 0:
+                        new_nodes.append(TextNode(sections[0],TextType.TEXT))
+                    
+                    new_nodes.append(TextNode(part[0], TextType.IMAGE, part[1]))
+                    remaining = sections[1]
+                
+                if len(remaining) != 0:
+                    new_nodes.append(TextNode(remaining,TextType.TEXT))
+        else:
+            new_nodes.append(node)
+        
     return new_nodes
         
 
