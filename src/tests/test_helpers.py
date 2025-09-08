@@ -253,6 +253,84 @@ class TestTextNode(unittest.TestCase):
             out,
         )
 
+    def test_no_links_returns_same_nodes(self):
+        node = TextNode("No links here, just text.", TextType.TEXT)
+        self.assertListEqual([node], split_nodes_links([node]))
+
+    def test_single_link_middle(self):
+        node = TextNode("See the [docs](https://example.com) please.", TextType.TEXT)
+        out = split_nodes_links([node])
+        self.assertListEqual(
+            [
+                TextNode("See the ", TextType.TEXT),
+                TextNode("docs", TextType.LINK, "https://example.com"),
+                TextNode(" please.", TextType.TEXT),
+            ],
+            out,
+        )
+
+    def test_multiple_links(self):
+        node = TextNode(
+            "Visit [a](https://a.com) and also [b](https://b.com).",
+            TextType.TEXT,
+        )
+        out = split_nodes_links([node])
+        self.assertListEqual(
+            [
+                TextNode("Visit ", TextType.TEXT),
+                TextNode("a", TextType.LINK, "https://a.com"),
+                TextNode(" and also ", TextType.TEXT),
+                TextNode("b", TextType.LINK, "https://b.com"),
+                TextNode(".", TextType.TEXT),
+            ],
+            out,
+        )
+
+    def test_adjacent_links_no_space(self):
+        node = TextNode(
+            "X[a](https://a.com)[b](https://b.com)Y",
+            TextType.TEXT,
+        )
+        out = split_nodes_links([node])
+        self.assertListEqual(
+            [
+                TextNode("X", TextType.TEXT),
+                TextNode("a", TextType.LINK, "https://a.com"),
+                TextNode("b", TextType.LINK, "https://b.com"),
+                TextNode("Y", TextType.TEXT),
+            ],
+            out,
+        )
+
+    def test_mixed_image_is_ignored_by_link_splitter(self):
+        node = TextNode(
+            "Img ![alt](https://img.com/i.png) then a [link](https://example.com).",
+            TextType.TEXT,
+        )
+        out = split_nodes_links([node])
+        self.assertListEqual(
+            [
+                TextNode("Img ![alt](https://img.com/i.png) then a ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://example.com"),
+                TextNode(".", TextType.TEXT),
+            ],
+            out,
+        )
+
+    def test_pass_through_non_text_nodes(self):
+        text = TextNode("Go to [site](https://s.com) now", TextType.TEXT)
+        image_node = TextNode("logo", TextType.IMAGE, "https://img.com/logo.png")
+        out = split_nodes_links([text, image_node])
+        self.assertListEqual(
+            [
+                TextNode("Go to ", TextType.TEXT),
+                TextNode("site", TextType.LINK, "https://s.com"),
+                TextNode(" now", TextType.TEXT),
+                image_node,
+            ],
+            out,
+        )
+
 if __name__ == "__main__":
     unittest.main()
 
