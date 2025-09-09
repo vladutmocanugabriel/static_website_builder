@@ -92,8 +92,27 @@ def split_nodes_links(old_nodes):
         else:
             new_nodes.append(node)
     return new_nodes
+
+def text_to_textnodes(text):
+    nodes = [TextNode(text, TextType.TEXT)]
+    nodes = split_nodes_image(nodes)
+    nodes = split_nodes_links(nodes)
+    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE_TEXT)
+    nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD_TEXT)
+    nodes = split_nodes_delimiter(nodes, "_", TextType.ITALIC_TEXT)
+    return nodes
         
 
-        
+def markdown_to_blocks(markdown):
+    blocks = re.split(r"\n\s*\n+", markdown)
+    cleaned = []
+    for block in blocks:
+        block = block.strip()
+        if not block:
+            continue
+        lines = [line.strip() for line in block.split("\n")]
+        cleaned.append("\n".join(lines))
+    return cleaned
+
 
             

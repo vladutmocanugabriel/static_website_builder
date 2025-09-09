@@ -331,6 +331,138 @@ class TestTextNode(unittest.TestCase):
             out,
         )
 
+    def test_mixed_text_image_link_bold_italic_code(self):
+        text = (
+            "This is **text** with an _italic_ word and a `code block` and an "
+            "![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        )
+        out = text_to_textnodes(text)
+        self.assertListEqual(
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("text", TextType.BOLD_TEXT),
+                TextNode(" with an ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC_TEXT),
+                TextNode(" word and a ", TextType.TEXT),
+                TextNode("code block", TextType.CODE_TEXT),
+                TextNode(" and an ", TextType.TEXT),
+                TextNode("obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+                TextNode(" and a ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://boot.dev"),
+            ],
+            out,
+        )
+
+    def test_plain_text_no_markup(self):
+        text = "Nothing special here."
+        out = text_to_textnodes(text)
+        self.assertListEqual([TextNode("Nothing special here.", TextType.TEXT)], out)
+
+    def test_unmatched_delimiters_raise(self):
+        text = "This **is not closed and _neither is this and `nor code"
+        with self.assertRaises(Exception) as ctx:
+            text_to_textnodes(text)
+        self.assertIn("Unmatched delimiter", str(ctx.exception))
+
+    def test_bold_then_italic_order_inside_bold_not_parsed(self):
+        text = "Start **bold and _italic_ inside** end"
+        out = text_to_textnodes(text)
+        self.assertListEqual(
+            [
+                TextNode("Start ", TextType.TEXT),
+                TextNode("bold and _italic_ inside", TextType.BOLD_TEXT),
+                TextNode(" end", TextType.TEXT),
+            ],
+            out,
+        )
+
+    def test_code_protects_inner_delimiters(self):
+        text = "Keep `**not bold** and _not italic_` literal"
+        out = text_to_textnodes(text)
+        self.assertListEqual(
+            [
+                TextNode("Keep ", TextType.TEXT),
+                TextNode("**not bold** and _not italic_", TextType.CODE_TEXT),
+                TextNode(" literal", TextType.TEXT),
+            ],
+            out,
+        )
+
+    def test_link_text_not_reparsed_by_bold_italic(self):
+        text = "Go to [**bold** link](https://ex.com) now"
+        out = text_to_textnodes(text)
+        self.assertListEqual(
+            [
+                TextNode("Go to ", TextType.TEXT),
+                TextNode("**bold** link", TextType.LINK, "https://ex.com"),
+                TextNode(" now", TextType.TEXT),
+            ],
+            out,
+        )
+
+    def test_markdown_to_blocks(self):
+        md = """
+This is **bolded** paragraph
+
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+
+- This is a list
+- with items
+"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "This is **bolded** paragraph",
+                "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
+                "- This is a list\n- with items",
+            ],
+        )
+
+    def test_markdown_to_blocks_trims_whitespace(self):
+        md = """
+    
+        First paragraph with spaces   
+    
+    
+        Second one indented
+    
+        """
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "First paragraph with spaces",
+                "Second one indented",
+            ],
+        )
+
+    def test_markdown_to_blocks_headings_and_lists(self):
+        md = """# Heading
+
+        - item one
+        - item two
+
+        Final paragraph
+        """
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "# Heading",
+                "- item one\n- item two",
+                "Final paragraph",
+            ],
+        )
+
+    def test_markdown_to_blocks_single_block(self):
+        md = "Only one paragraph, no double line breaks."
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(blocks, ["Only one paragraph, no double line breaks."])
+
+    
+
 if __name__ == "__main__":
     unittest.main()
 
