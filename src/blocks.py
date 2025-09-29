@@ -1,7 +1,10 @@
 from enum import Enum
 import re
-from src.helpers import *
-from src.htmlnode import *
+from enum import Enum
+import re
+from src.helpers import text_node_to_html_node, text_to_textnodes, markdown_to_blocks
+from src.htmlnode import ParentNode
+from src.textnode import TextNode, TextType
 
 class BlockType(Enum):
     PARAGRAPH = "paragraph"
@@ -70,7 +73,6 @@ def markdown_to_html_node(markdown):
                 lines = lines[:-1]
             code_text = "\n".join(lines)
 
-            code_textnode = TextNode(code_text, TextType.TEXT)
             code_leaf = text_node_to_html_node(TextNode(code_text, TextType.CODE_TEXT))
             parent_node.children.append(ParentNode("pre", [code_leaf]))
 

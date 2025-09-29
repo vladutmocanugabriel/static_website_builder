@@ -461,6 +461,37 @@ This is the same paragraph on a new line
         blocks = markdown_to_blocks(md)
         self.assertEqual(blocks, ["Only one paragraph, no double line breaks."])
 
+    def test_simple_h1_only(self):
+        md = "# Hello"
+        self.assertEqual(extract_title(md), "Hello")
+
+    def test_h1_after_paragraph(self):
+        md = "Intro paragraph\n\n# Title Here"
+        self.assertEqual(extract_title(md), "Title Here")
+
+    def test_h1_with_extra_spaces(self):
+        md = "#    Spaced Title   "
+        self.assertEqual(extract_title(md), "Spaced Title")
+
+    def test_ignores_h2_and_uses_h1(self):
+        md = "## Not the title\n\n# Real Title\n\n### Also not title"
+        self.assertEqual(extract_title(md), "Real Title")
+
+    def test_no_h1_raises(self):
+        md = "No headings here\n\n## Subheading\n\nParagraph"
+        with self.assertRaises(Exception) as ctx:
+            extract_title(md)
+        self.assertIn("missing", str(ctx.exception).lower())
+
+    def test_h1_among_other_blocks(self):
+        md = (
+            "> quote line\n\n"
+            "- item 1\n- item 2\n\n"
+            "Paragraph\n\n"
+            "# Final Title"
+        )
+        self.assertEqual(extract_title(md), "Final Title")
+
     
 
 if __name__ == "__main__":

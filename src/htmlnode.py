@@ -32,22 +32,32 @@ class HTMLNode():
          return f"HTMLNode({self.tag}, {self.value}, {self.children}, {self.props_to_html()})"
     
 
+
+VOID_TAGS = {"img", "br", "hr", "meta", "link", "input", "source", "area", "col", "embed", "param", "track", "wbr"}
+
 class LeafNode(HTMLNode):
     def __init__(self, tag, value, props=None):
         super().__init__(tag=tag, value=value, props=props)
 
 
     def to_html(self):
-        if not self.value or self.value == None:
-            raise ValueError
-        
-        if not self.tag or self.tag == None:
-            return self.value
-        
-        if self.props != None:
-            return f"<{self.tag} {self.props_to_html()}>{self.value}</{self.tag}>"
-        else:
-            return f"<{self.tag}>{self.value}</{self.tag}>"
+        def _attrs(props):
+            if not props:
+                return ""
+            return " " + " ".join(f'{k}="{v}"' for k, v in props.items())
+
+        # Text-only leaf (no tag): just return the value (even empty string)
+        if self.tag is None:
+            return "" if self.value is None else str(self.value)
+
+        # Void elements: no inner text required
+        if self.tag in VOID_TAGS:
+            return f"<{self.tag}{_attrs(self.props)}>"
+
+        # Normal elements: need a value
+        if self.value is None:
+            raise ValueError("LeafNode with non-void tag requires a value")
+        return f"<{self.tag}{_attrs(self.props)}>{self.value}</{self.tag}>"
         
 class ParentNode(HTMLNode):
     def __init__(self, tag, children, props=None):
