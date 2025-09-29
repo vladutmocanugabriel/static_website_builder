@@ -1,18 +1,13 @@
-from textnode import *
-from htmlnode import *
+import os
+from src.textnode import *
+from src.htmlnode import *
+from src.helpers import *
 
 def main():
-    text_node_one = TextNode("This is some bold text", TextType.BOLD_TEXT)
-    text_node_two = TextNode("Picture of a cat", TextType.IMAGE, "https://www.boot.dev")
-
-    text_node_one.__repr__()
-    text_node_two.__repr__()
-
-    html_node_one = HTMLNode("a", None, None, {"href": "https://www.google.com","target": "_blank",})
-    html_node_one.props_to_html()
-
-    node = TextNode("This is text with a `code block` word", TextType.TEXT)
-    left = node.text.split("`")
-    print(left)
+    root = os.getcwd()
+    public_path = os.path.join(root, "public")
+    static_path = os.path.join(root, "static")  
+    clean_public(public_path)
+    copy_to_public(static_path, public_path)
 
 main()

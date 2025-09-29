@@ -1,3 +1,4 @@
+import os, shutil
 import re
 from src.htmlnode import *
 from src.textnode import *
@@ -113,6 +114,30 @@ def markdown_to_blocks(markdown):
         lines = [line.strip() for line in block.split("\n")]
         cleaned.append("\n".join(lines))
     return cleaned
+
+def clean_public(public_path):
+    if not os.path.exists(public_path):
+        os.mkdir(public_path)
+        print(f"You're missing the public folder so we created it for you: {public_path}")
+    elif os.listdir(public_path):
+        for filename in os.listdir(public_path):
+            file_path = os.path.join(public_path, filename)
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.remove(file_path)
+                print(f"{file_path} has just been removed.")
+            elif os.path.isdir(file_path):
+                print(f"{file_path} folder and all it's content has just been removed")
+                shutil.rmtree(file_path) 
+
+def copy_to_public(source, destination):
+    for entry in os.listdir(source):
+        entry_path = os.path.join(source, entry)
+        if os.path.isdir(entry_path):
+            new_public_path = os.path.join(destination, entry)
+            os.mkdir(new_public_path)
+            copy_to_public(entry_path, new_public_path)
+        elif os.path.isfile(entry_path):
+            shutil.copy2(entry_path, destination)
 
 
             
