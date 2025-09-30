@@ -11,7 +11,7 @@ def extract_title(markdown):
     raise Exception("You're missing the h1 element.")
 
 def generate_page(from_path, template_path, dest_path):
-    #print(f"Generating page from {from_path} to {dest_path} using {template_path}.")
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}.")
 
     with open(from_path, "r") as markdown_file:
         print(f"We're opening and reading the file from: {from_path}")
