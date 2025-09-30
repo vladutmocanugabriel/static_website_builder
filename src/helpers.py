@@ -119,13 +119,13 @@ def markdown_to_blocks(markdown):
         cleaned.append("\n".join(lines))
     return cleaned
 
-def clean_public(public_path):
-    if not os.path.exists(public_path):
-        os.mkdir(public_path)
-        print(f"You're missing the public folder so we created it for you: {public_path}")
-    elif os.listdir(public_path):
-        for filename in os.listdir(public_path):
-            file_path = os.path.join(public_path, filename)
+def clean_public(docs_path):
+    if not os.path.exists(docs_path):
+        os.mkdir(docs_path)
+        print(f"You're missing the public folder so we created it for you: {docs_path}")
+    elif os.listdir(docs_path):
+        for filename in os.listdir(docs_path):
+            file_path = os.path.join(docs_path, filename)
             if os.path.isfile(file_path) or os.path.islink(file_path):
                 os.remove(file_path)
                 print(f"{file_path} has just been removed.")
