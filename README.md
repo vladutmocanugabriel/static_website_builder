@@ -43,4 +43,7 @@ This project is a Python-powered static site generator that turns Markdown conte
 - Ordered (`1.`) and unordered (`-`) lists
 - Fenced code blocks ( ``` ) rendered inside `<pre><code>`
 
+## LIVE Preview
+- [Static Website Generator from .md](https://vladutmocanugabriel.github.io/static_website_builder/)
+
 Together, these pieces form a minimal yet full-featured static site pipeline that you can adapt for new content, custom designs, or deployment targets.
