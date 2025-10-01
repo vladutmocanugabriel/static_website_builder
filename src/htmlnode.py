@@ -46,15 +46,12 @@ class LeafNode(HTMLNode):
                 return ""
             return " " + " ".join(f'{k}="{v}"' for k, v in props.items())
 
-        # Text-only leaf (no tag): just return the value (even empty string)
         if self.tag is None:
             return "" if self.value is None else str(self.value)
 
-        # Void elements: no inner text required
         if self.tag in VOID_TAGS:
             return f"<{self.tag}{_attrs(self.props)}>"
 
-        # Normal elements: need a value
         if self.value is None:
             raise ValueError("LeafNode with non-void tag requires a value")
         return f"<{self.tag}{_attrs(self.props)}>{self.value}</{self.tag}>"
